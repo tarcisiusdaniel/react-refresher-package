@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 
 import Places from './components/Places.jsx';
 import { AVAILABLE_PLACES } from './data.js';
@@ -21,7 +21,9 @@ const fetchedSelectedPlaces = currSelectedPlacesIds.map((id) => {
 });
 
 function App() {
-  const modal = useRef();
+  // const modal = useRef();
+  const [randomState, setRandomState] = useState();
+  const [modalIsOpen, setModalIsOpen] = useState(false);
   const selectedPlace = useRef();
   const [availablePlaces, setAvailablePlaces] = useState([]);
   const [pickedPlaces, setPickedPlaces] = useState(fetchedSelectedPlaces);
@@ -32,8 +34,8 @@ function App() {
   // if there is no number 2, state update will cause inifinite loop (BAD)
   useEffect(() => {
     navigator.geolocation.getCurrentPosition((position) => {
-      console.log(position.coords.latitude);
-      console.log(position.coords.longitude);
+      // console.log(position.coords.latitude);
+      // console.log(position.coords.longitude);
       const sortedPlaces = sortPlacesByDistance(
         AVAILABLE_PLACES, 
         position.coords.latitude,
@@ -51,12 +53,14 @@ function App() {
   // This will cause a rendering inifinite loop, AND IT IS DEF BAD< A PROBLEM FOR SURE
 
   function handleStartRemovePlace(id) {
-    modal.current.open();
+    // modal.current.open();
+    setModalIsOpen(true);
     selectedPlace.current = id;
   }
 
   function handleStopRemovePlace() {
-    modal.current.close();
+    // modal.current.close();
+    setModalIsOpen(false);
   }
 
   function handleSelectPlace(id) {
@@ -65,7 +69,7 @@ function App() {
         return prevPickedPlaces;
       }
       const place = AVAILABLE_PLACES.find((place) => place.id === id);
-      console.log(place);
+      // console.log(place);
       return [place, ...prevPickedPlaces];
     });
     
@@ -85,7 +89,7 @@ function App() {
     // get: use .parse
   }
 
-  function handleRemovePlace() {
+  const handleRemovePlace = useCallback(function handleRemovePlace() {
     setPickedPlaces((prevPickedPlaces) =>
       prevPickedPlaces.filter((place) => place.id !== selectedPlace.current)
     );
@@ -93,12 +97,13 @@ function App() {
     // remove the item in the list in localStorage as well
     const newStoredIds = JSON.parse(localStorage.getItem('selectedPlaces')).filter((id) => id !== selectedPlace.current );
     localStorage.setItem('selectedPlaces', JSON.stringify(newStoredIds));
-    modal.current.close();
-  }
+    // modal.current.close();
+    setModalIsOpen(false);
+  }, []);
 
   return (
     <>
-      <Modal ref={modal}>
+      <Modal open = {modalIsOpen} handleOnClose = {handleStopRemovePlace}>
         <DeleteConfirmation
           onCancel={handleStopRemovePlace}
           onConfirm={handleRemovePlace}
