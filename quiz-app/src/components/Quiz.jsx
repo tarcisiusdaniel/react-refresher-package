@@ -27,6 +27,7 @@ export default function Quiz() {
         )
     }
 
+    console.log("hey wassup");
     const shuffledActiveQuestionAnswers = [...QUESTIONS[activeQuestionIndex].answers];
     shuffledActiveQuestionAnswers.sort(() => Math.random() - 0.5);
 
