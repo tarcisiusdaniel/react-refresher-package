@@ -1,28 +1,27 @@
 import { useState, useEffect, useRef } from "react";
 
-const PROGRESS_TIME = 5000;
+const PROGRESS_TIME = 10000;
 const INTERVAL_SPEED = 10;
 
 export default function ProgressBar({onFinish, intervalSpeed}) {
     const [remainingTime, setRemainingTime] = useState(PROGRESS_TIME);
     useEffect(() => {
-        // console.log("timeout");
-        const timeout = setTimeout(onFinish, PROGRESS_TIME);
+        const timeout = setTimeout(onFinish, remainingTime);
 
         return (
             () => {
                 clearTimeout(timeout);
             }
         );
-    }, [onFinish]);
+    }, [onFinish, remainingTime]);
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setRemainingTime((prevTime) => prevTime - INTERVAL_SPEED)
-        }, INTERVAL_SPEED);
+            setRemainingTime((prevTime) => prevTime - intervalSpeed)
+        }, 10);
 
         return () => clearInterval(interval);
-    }, []);
+    }, [intervalSpeed]);
 
     return (
         <progress value = {remainingTime} max = {PROGRESS_TIME}></progress>

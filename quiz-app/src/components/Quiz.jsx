@@ -6,39 +6,42 @@ import QuizComplete from "./quiz/QuizComplete";
 
 export default function Quiz() {
     const [userAnswers, setUserAnswers] = useState([]);
-    // const [intervalSpeed, setIntervalSpeed] = useState(10);
-    // const [rightAnswers, setRightAnswers] = useState([]);
-    const currUserAnswer = useRef();
-    currUserAnswer.current = "N/A";
-
-    // console.log(currUserAnswer);
-    // console.log(userAnswers);
-
+    const [intervalSpeed, setIntervalSpeed] = useState(10);
     // this is derived state
     // a state created by using other state as vocal point
     // better than creating lots of state and each uses useState
     const activeQuestionIndex = userAnswers.length;
+    const [shuffledActiveQuestionAnswers, setShuffledActiveQuestionAnswers] = useState([]);
+    const [currUserAnswer, setCurrUserAnswer] = useState("N/A");
+    // currUserAnswer.current = "N/A";
 
-    let shuffledActiveQuestionAnswers = (activeQuestionIndex < QUESTIONS.length) ? [...QUESTIONS[activeQuestionIndex].answers] : [];
-    shuffledActiveQuestionAnswers.sort(() => Math.random() - 0.5);
+    console.log(userAnswers);
+
+    useEffect(() => {
+        if (activeQuestionIndex < QUESTIONS.length) {
+            setShuffledActiveQuestionAnswers((prev) => {
+                const answers = [...QUESTIONS[activeQuestionIndex].answers];
+                answers.sort(() => Math.random() - 0.5);
+                return answers;
+            })
+        }
+
+    }, [activeQuestionIndex]);
 
     // make sure that when we click on the answer, 
     // the timeout is resetted
     function handleSelectAnswer(answer) {
-        currUserAnswer.current = answer;
-        // setIntervalSpeed(25);
+        setIntervalSpeed(25);
+        setCurrUserAnswer(answer);
     }
 
     // add the current answer to user answer, and reset everything other state
     const handleQuestionTimedOut = () => {
-        // setRightAnswers((prevRightAnswers) => {
-        //     return [...prevRightAnswers, QUESTIONS[activeQuestionIndex].answers[0]];
-        // });
         setUserAnswers((prevUserAnswers) => {
-            let added = currUserAnswer.current;
+            let added = currUserAnswer;
             return [...prevUserAnswers, added];
         });
-        // setIntervalSpeed(10);
+        setIntervalSpeed(10);
     };
 
     if (activeQuestionIndex === QUESTIONS.length) {
@@ -55,7 +58,7 @@ export default function Quiz() {
                 <ProgressBar 
                     key = {activeQuestionIndex} //whenever this changes, the old component will be destrroyed in the DOM, and replaced by a new one
                     onFinish = {handleQuestionTimedOut} 
-                    // intervalSpeed={intervalSpeed}
+                    intervalSpeed = {intervalSpeed} 
                 />
                 <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
                 <ul id = "answers">
