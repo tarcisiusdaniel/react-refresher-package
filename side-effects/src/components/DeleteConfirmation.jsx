@@ -40,7 +40,7 @@ export default function DeleteConfirmation({ onConfirm, onCancel }) {
       // console.log('Clearing timeout...');
       clearTimeout(deleteTimer);
     }
-  }, [onConfirm]);
+  }, []);
   
 
   return (
