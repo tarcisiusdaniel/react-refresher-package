@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-const PROGRESS_TIME = 10000;
+const PROGRESS_TIME = 5000;
 const INTERVAL_SPEED = 10;
 
 export default function ProgressBar({onFinish, intervalSpeed}) {
